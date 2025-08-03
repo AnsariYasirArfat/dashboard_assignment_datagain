@@ -11,9 +11,10 @@ import {
   Building2,
   ListTodo,
   Settings,
-  LogOut,
+  Power,
 } from "lucide-react";
 import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
 
 interface SidebarProps {
   closeDrawer?: () => void;
@@ -64,7 +65,7 @@ export default function Sidebar({ closeDrawer, isDrawer }: SidebarProps) {
             variant="ghost"
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
-            className="w-8 h-8 bg-white rounded-full text-teal-500 hover:bg-gray-10 shadow-lg"
+            className="w-6 h-6 bg-white rounded-full text-custom-teal hover:bg-gray-100 shadow-lg"
           >
             <ChevronLeft
               size={16}
@@ -79,7 +80,7 @@ export default function Sidebar({ closeDrawer, isDrawer }: SidebarProps) {
       )}
 
       {/* Navigation Items */}
-      <nav className="flex-1 px-4 space-y-2 overflow-auto">
+      <nav className="flex-1 px-4 space-y-2 overflow-y-auto overflow-x-hidden">
         {navItems.map((item, index) => (
           <div
             onClick={() => handleNav("/settings")}
@@ -88,17 +89,21 @@ export default function Sidebar({ closeDrawer, isDrawer }: SidebarProps) {
               "flex items-center gap-3  p-2 rounded-md transition-colors relative group cursor-pointer",
               item.isActive
                 ? "bg-gray-200/30 "
-                : "text-gray-300 hover:bg-gray-200/30  hover:text-white"
+                : "text-gray-300 hover:bg-gray-200/30  hover:text-white",
+              !collapsed || isDrawer ? "" : "justify-center"
             )}
           >
             <div className="">{item.icon}</div>
             {(!collapsed || isDrawer) && (
               <>
-                <span className="flex-1">{item.label}</span>
+                <span className="flex-1 truncate">{item.label}</span>
                 {item.badge && (
-                  <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  <Badge
+                    variant="destructive"
+                    className="bg-custom-red text-white text-xs px-2 py-0.5 rounded-full"
+                  >
                     {item.badge}
-                  </div>
+                  </Badge>
                 )}
               </>
             )}
@@ -111,8 +116,9 @@ export default function Sidebar({ closeDrawer, isDrawer }: SidebarProps) {
         <div
           onClick={() => handleNav("/settings")}
           className={cn(
-            "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer",
-            "text-gray-300 hover:bg-gray-700/50 hover:text-white"
+            "flex items-center gap-3 px-3 py-2 rounded-md transition-colors cursor-pointer",
+            "text-gray-300 hover:bg-gray-700/50 hover:text-white",
+            !collapsed || isDrawer ? "" : "justify-center"
           )}
         >
           <div>
@@ -125,11 +131,11 @@ export default function Sidebar({ closeDrawer, isDrawer }: SidebarProps) {
           variant="ghost"
           onClick={() => handleNav("/logout")}
           className={cn(
-            "w-full justify-start gap-3 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white cursor-pointer",
+            "w-full justify-center gap-3 px-3 py-2 bg-custom-teal hover:bg-custom-teal/80  cursor-pointer",
             !collapsed || isDrawer ? "" : "justify-center"
           )}
         >
-          <LogOut size={20} />
+          <Power size={20} />
           {(!collapsed || isDrawer) && <span>Logout</span>}
         </Button>
       </div>

@@ -3,6 +3,7 @@ import "./globals.css";
 import AppShell from "@/components/layouts/AppShell";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import StoreProvider from "@/components/providers/StoreProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Property Tax Plus",
@@ -25,6 +26,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <AppShell>{children}</AppShell>
+            <Toaster />
           </ThemeProvider>
         </StoreProvider>
       </body>
