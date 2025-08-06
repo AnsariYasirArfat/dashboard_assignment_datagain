@@ -3,18 +3,37 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppSelector, useAppDispatch } from "@/store/hook";
+import { setCurrentPage, setItemsPerPage } from "@/store/reducers/appealLetterSlice";
 
 export function Pagination() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [goToPage, setGoToPage] = useState("10");
+  const dispatch = useAppDispatch();
+  const { currentPage, itemsPerPage, data, searchTerm } = useAppSelector(
+    (state) => state.appealLetter
+  );
 
-  const totalPages = 10;
-  const totalItems = 120;
-  const itemsPerPage = 10;
+  const [goToPage, setGoToPage] = useState(currentPage.toString());
+
+  // Filter data based on search term
+  const filteredData = data.filter((item) =>
+    Object.values(item).some((value) =>
+      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+  const handleGoToPage = () => {
+    const page = parseInt(goToPage);
+    if (page >= 1 && page <= totalPages) {
+      dispatch(setCurrentPage(page));
+    }
+  };
 
   const getPageNumbers = () => {
     const pages = [];
@@ -45,15 +64,8 @@ export function Pagination() {
     return pages;
   };
 
-  const handleGoToPage = () => {
-    const page = parseInt(goToPage);
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
   return (
-    <div className="mt-4 rounded-md shadow flex items-center justify-between px-6 py-1 bg-custom-gray dark:bg-gray-900 ">
+    <div className="mt-4 rounded-md shadow flex items-center justify-between px-6 py-1 bg-custom-gray dark:bg-gray-900">
       <div className="text-xs text-gray-500 dark:text-gray-400">
         {startItem}-{endItem} of {totalItems}
       </div>
@@ -61,7 +73,7 @@ export function Pagination() {
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
-          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+          onClick={() => dispatch(setCurrentPage(Math.max(1, currentPage - 1)))}
           disabled={currentPage === 1}
           className="flex items-center gap-1"
         >
@@ -76,13 +88,14 @@ export function Pagination() {
                 <span className="px-2 py-1 text-gray-500">...</span>
               ) : (
                 <Button
-                  variant={currentPage === page ? "ghost" : "ghost"}
-                  onClick={() => setCurrentPage(page as number)}
-                  className={cn("py-0.5 h-6",
+                  variant="ghost"
+                  onClick={() => dispatch(setCurrentPage(page as number))}
+                  className={cn(
+                    "py-0.5 h-6",
                     currentPage === page
-                      ? "bg-white dark:bg-black text-black dark:text-white "
-                      : "text-gray-400")
-                  }
+                      ? "bg-white dark:bg-black text-black dark:text-white"
+                      : "text-gray-400"
+                  )}
                 >
                   {page}
                 </Button>
@@ -93,7 +106,7 @@ export function Pagination() {
 
         <Button
           variant="ghost"
-          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+          onClick={() => dispatch(setCurrentPage(Math.min(totalPages, currentPage + 1)))}
           disabled={currentPage === totalPages}
           className="flex items-center gap-1"
         >
