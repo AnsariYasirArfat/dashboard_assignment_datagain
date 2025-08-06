@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,29 +17,103 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pagination } from "./Pagination";
-import { appealData, appealDataColumns } from "@/data/appeal-letter";
+import { AppealData, appealDataColumns } from "@/data/appeal-letter";
 import { cn } from "@/lib/utils";
+import { SelectionToast } from "./SelectionToast";
+import { toast } from "sonner";
+import { useAppSelector, useAppDispatch } from "@/store/hook";
+import {
+  toggleRowSelection,
+  selectAllRows,
+  clearSelection,
+  setSortColumn,
+  setSortDirection,
+} from "@/store/reducers/appealLetterSlice";
 
-interface AppealLetterTableProps {
-  selectedRows: Set<string>;
-  onRowSelection: (rowId: string, isSelected: boolean) => void;
-  onSelectAll: (isSelected: boolean) => void;
-}
+export function AppealLetterTable() {
+  const dispatch = useAppDispatch();
+  const {
+    data: appealData,
+    selectedRows,
+    sortColumn,
+    sortDirection,
+    searchTerm,
+    currentPage,
+    itemsPerPage,
+  } = useAppSelector((state) => state.appealLetter);
 
-export function AppealLetterTable({
-  selectedRows,
-  onRowSelection,
-  onSelectAll,
-}: AppealLetterTableProps) {
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  // Filter data based on search term
+  const filteredData = appealData.filter((item) =>
+    Object.values(item).some((value) =>
+      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  // Sort data
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (!sortColumn) return 0;
+
+    const aValue = a[sortColumn as keyof AppealData];
+    const bValue = b[sortColumn as keyof AppealData];
+
+    if (sortDirection === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    }
+  });
+
+  // Paginate data
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  const handleRowSelection = (rowId: string, isSelected: boolean) => {
+    dispatch(toggleRowSelection(rowId));
+
+    // Check if we need to show/hide toast
+    const newSelection = isSelected
+      ? [...selectedRows, rowId]
+      : selectedRows.filter((id) => id !== rowId);
+
+    if (newSelection.length > 0) {
+      toast.custom(
+        (id) => (
+          <SelectionToast
+            id={id}
+            selectedCount={newSelection.length}
+            onClear={() => dispatch(clearSelection())}
+          />
+        ),
+        { position: "bottom-center" }
+      );
+    }
+  };
+
+  const handleSelectAll = (isSelected: boolean) => {
+    dispatch(selectAllRows(isSelected));
+
+    if (isSelected) {
+      const allIds = paginatedData.map((item) => item.id);
+      toast.custom(
+        (id) => (
+          <SelectionToast
+            id={id}
+            selectedCount={allIds.length}
+            onClear={() => dispatch(clearSelection())}
+          />
+        ),
+        { position: "bottom-center" }
+      );
+    }
+  };
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      dispatch(setSortDirection(sortDirection === "asc" ? "desc" : "asc"));
     } else {
-      setSortColumn(column);
-      setSortDirection("asc");
+      dispatch(setSortColumn(column));
+      dispatch(setSortDirection("asc"));
     }
   };
 
@@ -61,19 +134,21 @@ export function AppealLetterTable({
     );
   };
 
+  // Check if all rows on current page are selected
   const isAllSelected =
-    appealData.length > 0 && selectedRows.size === appealData.length;
+    paginatedData.length > 0 &&
+    paginatedData.every((row) => selectedRows.includes(row.id));
 
   return (
-    <div className="rounded-t-md overflow-hidden">
-      <div className="overflow-x-auto">
-        <Table className="min-w-[1200px]">
+    <div className="rounded-t-md overflow-hidden min-h-0 flex flex-col h-full">
+      <div className="overflow-auto  flex-1 h-full y-hidden">
+        <Table className="min-w-[1200px] ">
           <TableHeader>
             <TableRow className="bg-[#ecf3f9] dark:bg-gray-700 [&_button]:text-xs">
               <TableHead className="sticky left-0 bg-[#ecf3f9] dark:bg-gray-700 z-10">
                 <Checkbox
                   checked={isAllSelected}
-                  onCheckedChange={onSelectAll}
+                  onCheckedChange={handleSelectAll}
                   className="mx-4 data-[state=checked]:bg-custom-red data-[state=checked]:dark:bg-custom-red data-[state=checked]:border-none border-black dark:border-white"
                 />
               </TableHead>
@@ -97,17 +172,19 @@ export function AppealLetterTable({
               </TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {appealData.map((row) => (
+          <TableBody className="overflow-auto">
+            {paginatedData.map((row) => (
               <TableRow
                 key={row.id}
-                className={selectedRows.has(row.id) ? "bg-custom-teal/10" : ""}
+                className={
+                  selectedRows.includes(row.id) ? "bg-custom-teal/10" : ""
+                }
               >
                 <TableCell className="sticky left-0 bg-white dark:bg-gray-800 z-10">
                   <Checkbox
-                    checked={selectedRows.has(row.id)}
+                    checked={selectedRows.includes(row.id)}
                     onCheckedChange={(checked) =>
-                      onRowSelection(row.id, checked as boolean)
+                      handleRowSelection(row.id, checked as boolean)
                     }
                     className="mx-4 data-[state=checked]:bg-custom-red data-[state=checked]:dark:bg-custom-red data-[state=checked]:border-none border-black dark:border-white"
                   />
