@@ -12,9 +12,12 @@ import {
   ListTodo,
   Settings,
   Power,
+  Search,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
+import Image from "next/image";
 
 interface SidebarProps {
   closeDrawer?: () => void;
@@ -78,7 +81,33 @@ export default function Sidebar({ closeDrawer, isDrawer }: SidebarProps) {
           </Button>
         </div>
       )}
+      <div className="my-4 flex lg:hidden flex-col items-center gap-2 xl:gap-4 justify-center">
+        <span className="text-sm text-gray-600 dark:text-gray-400 font-semibold">
+          Client Workspace:
+        </span>
+        <div className="flex items-center gap-2 xl:gap-6 rounded border px-2 py-1 cursor-pointer">
+          <Image
+            src={"/logo_2.png"}
+            width={30}
+            height={30}
+            alt="property-tax-plus-logo"
+            className="object-contain"
+          />
+          <ChevronDown size={16} />
+        </div>
 
+        <div className="relative">
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={16}
+          />
+          <input
+            type="text"
+            placeholder="Search"
+            className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-custom-teal "
+          />
+        </div>
+      </div>  
       {/* Navigation Items */}
       <nav className="flex-1 px-4 space-y-2 overflow-y-auto overflow-x-hidden">
         {navItems.map((item, index) => (

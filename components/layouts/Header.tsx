@@ -9,18 +9,16 @@ import { Separator } from "../ui/separator";
 
 export default function Header() {
   return (
-    <header className="bg-white dark:bg-black rounded-lg w-full flex items-center justify-between px-6 py-4">
+    <header className="bg-white dark:bg-black rounded-lg w-full flex flex-wrap items-center justify-between px-2 xl:px-6 py-4">
       {/* Left Section */}
       <div className="flex items-center gap-4">
         {/* Drawer Sidebar Button (Mobile) */}
-        <div className="lg:hidden">
-          <DrawerSidebar />
-        </div>
+       
 
         {/* Logo */}
         <Link
           href={"/"}
-          className="flex items-center gap-1 cursor-pointer relative h-8 w-56"
+          className="flex items-center gap-1 cursor-pointer relative h-6 w-44 sm:h-8 sm:w-56"
         >
           <Image
             src={"/logo.png"}
@@ -32,11 +30,11 @@ export default function Header() {
       </div>
 
       {/* Middle Section */}
-      <div className="hidden md:flex items-center gap-4 flex-1 justify-center">
+      <div className="hidden lg:flex items-center gap-2 xl:gap-4 flex-1 justify-center">
         <span className="text-sm text-gray-600 dark:text-gray-400 font-semibold">
           Client Workspace:
         </span>
-        <div className="flex items-center gap-6 rounded border px-2 py-1 cursor-pointer">
+        <div className="flex items-center gap-2 xl:gap-6 rounded border px-2 py-1 cursor-pointer">
           <Image
             src={"/logo_2.png"}
             width={30}
@@ -61,7 +59,7 @@ export default function Header() {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-4 h-8">
+      <div className="hidden lg:flex items-center gap-2 xl:gap-4 h-8">
         <Image
           src={"/logo_2.png"}
           width={50}
@@ -94,6 +92,10 @@ export default function Header() {
           <LayoutGrid fill=""/>
         </Button>
       </div>
+
+      <div className="lg:hidden ml-auto">
+          <DrawerSidebar />
+        </div>
     </header>
   );
 }

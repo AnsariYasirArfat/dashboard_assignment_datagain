@@ -14,7 +14,7 @@ export default function HomePage() {
           <SearchAndFilters />
         </div>
 
-        {/* Data Table - Takes remaining space */}
+        {/* Data Table */}
         <div className="flex-1 min-h-0">
           <AppealLetterTable />
         </div>

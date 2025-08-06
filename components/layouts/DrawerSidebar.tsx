@@ -23,7 +23,7 @@ export default function DrawerSidebar() {
       </Button>
 
       <Drawer open={open} onOpenChange={setOpen} direction="left">
-        <DrawerContent className="p-0 w-64 h-full">
+        <DrawerContent className="p-0 h-full data-[vaul-drawer-direction=left]:w-64 data-[vaul-drawer-direction=left]:border-none rounded-lg bg-transparent">
           <Sidebar closeDrawer={closeDrawer} isDrawer />
         </DrawerContent>
         <DrawerOverlay onClick={closeDrawer} />
