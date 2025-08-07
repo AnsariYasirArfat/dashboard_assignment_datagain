@@ -3,17 +3,19 @@
 import { PageHeader } from "@/components/appeal-letter/PageHeader";
 import { AppealLetterForm } from "@/components/appeal-letter/AppealLetterForm";
 import { useAppSelector } from "@/store/hook";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { AppealData } from "@/data/appeal-letter";
 
 interface EditAppealLetterProps {
-  params: {
+  params: Promise<{
     letterId: string;
-  };
+  }>;
 }
 
-export default function EditAppealLetter({ params }: EditAppealLetterProps) {
-  const { letterId } = params;
+export default function EditAppealLetter({
+  params,
+}: Readonly<EditAppealLetterProps>) {
+  const { letterId } = use(params);
   const [appealData, setAppealData] = useState<AppealData | null>(null);
   const { data } = useAppSelector((state) => state.appealLetter);
 
