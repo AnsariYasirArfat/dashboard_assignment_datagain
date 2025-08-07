@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col h-full">
       {/* Page Header */}
-      <PageHeader />
+      <PageHeader title="Appeal Letter" badge="05" />
 
       <div className="bg-white dark:bg-black rounded-lg p-4 flex flex-col flex-1 min-h-0">
         {/* Search and Filters */}

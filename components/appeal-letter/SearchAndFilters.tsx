@@ -1,9 +1,22 @@
-'use client'
-import { Search, MoreVertical, SlidersVertical } from "lucide-react";
+"use client";
+import {
+  Search,
+  MoreVertical,
+  SlidersVertical,
+  Download,
+  Plus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppSelector, useAppDispatch } from "@/store/hook";
 import { setSearchTerm } from "@/store/reducers/appealLetterSlice";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { PageActionsMenu } from "./PageActionsMenu";
 
 export function SearchAndFilters() {
   const dispatch = useAppDispatch();
@@ -37,13 +50,7 @@ export function SearchAndFilters() {
         <SlidersVertical />
       </Button>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="text-gray-600 dark:text-gray-400 rounded-full"
-      >
-        <MoreVertical />
-      </Button>
+      <PageActionsMenu />
     </div>
   );
 }

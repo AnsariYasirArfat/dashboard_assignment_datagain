@@ -2,11 +2,11 @@ export interface AppealData {
   id: string;
   taxYear: string;
   company: string;
-  state: string;
+  state: StateCode;
   assessor: string;
   accountNumber: string;
   appealedDate: string;
-  status: "Not Sent" | "Sent";
+  status: "NOTSENT" | "SENT";
   appealedBy: string;
 }
 
@@ -27,37 +27,77 @@ export const appealDataColumns: ColumnConfig[] = [
   { key: "appealedBy", label: "APPEALED BY", className: "min-w-36" },
 ];
 
-const stateCodes = [
+export const stateCodes = [
   "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
   "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
   "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
   "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-  "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
-];
+  "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+] as const;
+
+export type StateCode = typeof stateCodes[number];
+
+// Status options with labels
+export const statusOptions = [
+  { value: "NOTSENT", label: "Not Sent" },
+  { value: "SENT", label: "Sent" },
+] as const;
+
+export type StatusValue = typeof statusOptions[number]["value"];
+
+// Helper functions for date formatting
+export const formatDateForDisplay = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+};
+
+export const formatDateForInput = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+};
+
+export const parseDisplayDate = (displayDate: string): string => {
+  const date = new Date(displayDate);
+  return date.toISOString();
+};
 
 const newEntries: AppealData[] = Array.from({ length: 94 }, (_, i) => {
   const id = (i + 1).toString();
-  const taxYear = (1922 + i).toString(); 
+  const taxYear = (1922 + i).toString();
   const company = `New Railway Company ${id}`;
   const state = stateCodes[i % 50];
   const assessor = `New Assessor ${id}`;
-  const accountNumber = `NEW_ACCT${String(i + 1).padStart(3, '0')}`; 
-  const appealedDate = `June 25, ${taxYear}`;
-  const status = i % 2 === 0 ? "Not Sent" : "Sent"; 
+  const accountNumber = `NEW_ACCT${String(i + 1).padStart(3, "0")}`;
+  const appealedDate = new Date(1922 + i, 5, 25).toISOString(); // June 25
+  const status = i % 2 === 0 ? "NOTSENT" : "SENT";
   const appealedBy = "Jack Ryan";
-  return { id, taxYear, company, state, assessor, accountNumber, appealedDate, status, appealedBy };
+  return {
+    id,
+    taxYear,
+    company,
+    state,
+    assessor,
+    accountNumber,
+    appealedDate,
+    status,
+    appealedBy,
+  };
 });
 
 const originalEntries: AppealData[] = [
   {
-    id: "95", 
+    id: "95",
     taxYear: "2022",
     company: "KWT Railway Inc.",
     state: "UT",
     assessor: "City Of Dublin",
     accountNumber: "400 294_400 294",
-    appealedDate: "June 25, 2022",
-    status: "Sent",
+    appealedDate: new Date(2022, 5, 25).toISOString(),
+    status: "SENT",
     appealedBy: "Jack Ryan",
   },
   {
@@ -67,8 +107,8 @@ const originalEntries: AppealData[] = [
     state: "KY",
     assessor: "Pike County Revenue Commissioner",
     accountNumber: "PUBUT-000780 (TROY)-50054",
-    appealedDate: "June 25, 2021",
-    status: "Not Sent",
+    appealedDate: new Date(2021, 5, 25).toISOString(),
+    status: "NOTSENT",
     appealedBy: "Jack Ryan",
   },
   {
@@ -78,30 +118,30 @@ const originalEntries: AppealData[] = [
     state: "OH",
     assessor: "Ellicottville Tax Collector",
     accountNumber: "043689 38.004-1-31",
-    appealedDate: "June 25, 2020",
-    status: "Not Sent",
+    appealedDate: new Date(2020, 5, 25).toISOString(),
+    status: "NOTSENT",
     appealedBy: "Jack Ryan",
   },
   {
-    id: "98", 
+    id: "98",
     taxYear: "2019",
     company: "Buffalo and Pittsburgh Railroad, Inc.",
     state: "NY",
     assessor: "City Of Buffalo Assessor",
     accountNumber: "10782900",
-    appealedDate: "June 25, 2019",
-    status: "Sent",
+    appealedDate: new Date(2019, 5, 25).toISOString(),
+    status: "SENT",
     appealedBy: "Jack Ryan",
   },
   {
-    id: "99", 
+    id: "99",
     taxYear: "2018",
     company: "First Coast Railroad Inc.",
     state: "GA",
     assessor: "Camden County Tax",
     accountNumber: "UTIL150_Camden County",
-    appealedDate: "June 25, 2018",
-    status: "Not Sent",
+    appealedDate: new Date(2018, 5, 25).toISOString(),
+    status: "NOTSENT",
     appealedBy: "Jack Ryan",
   },
   {
@@ -111,11 +151,14 @@ const originalEntries: AppealData[] = [
     state: "AL",
     assessor: "Wilcox County Tax Collector",
     accountNumber: "1_87060",
-    appealedDate: "June 25, 2017",
-    status: "Not Sent",
+    appealedDate: new Date(2017, 5, 25).toISOString(),
+    status: "NOTSENT",
     appealedBy: "Jack Ryan",
   },
 ];
 
 // Combine new and original entries
-export const initialAppealData: AppealData[] = [...newEntries, ...originalEntries].reverse();
+export const initialAppealData: AppealData[] = [
+  ...newEntries,
+  ...originalEntries,
+].reverse();
