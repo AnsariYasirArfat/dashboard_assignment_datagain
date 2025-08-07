@@ -27,6 +27,7 @@ import {
   parseDisplayDate,
   StateCode,
 } from "@/data/appeal-letter";
+import { cn } from "@/lib/utils";
 
 // Validation schema
 const schema = yup.object({
@@ -98,7 +99,7 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
         ...data,
         appealedDate: parseDisplayDate(data.appealedDate),
       };
-
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       if (mode === "add") {
         dispatch(addAppealLetter(formData));
         router.push("/");
@@ -122,21 +123,24 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
   );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-6 overflow-auto min-h-0 my-8"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Tax Year */}
         <div className="space-y-2">
           <Label htmlFor="taxYear">Tax Year *</Label>
           <Controller
             name="taxYear"
             control={control}
-            // defaultValue={
-            //   mode === "edit" && initialData ? initialData.taxYear : ""
-            // }
+            defaultValue={
+              mode === "edit" && initialData ? initialData.taxYear : ""
+            }
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger
-                  className={errors.taxYear ? "border-red-500" : ""}
+                  className={cn("w-full", errors.taxYear && "border-red-500")}
                 >
                   <SelectValue placeholder="Select tax year" />
                 </SelectTrigger>
@@ -163,7 +167,7 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
             {...register("company")}
             placeholder="Enter company name"
             maxLength={100}
-            className={errors.company ? "border-red-500" : ""}
+            className={cn("w-full", errors.company && "border-red-500")}
             defaultValue={
               mode === "edit" && initialData ? initialData.company : ""
             }
@@ -186,7 +190,9 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
             }
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className={errors.state ? "border-red-500" : ""}>
+                <SelectTrigger
+                  className={cn("w-full", errors.state && "border-red-500")}
+                >
                   <SelectValue placeholder="Select state" />
                 </SelectTrigger>
                 <SelectContent>
@@ -212,7 +218,7 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
             {...register("assessor")}
             placeholder="Enter assessor name"
             maxLength={100}
-            className={errors.assessor ? "border-red-500" : ""}
+            className={cn("w-full", errors.assessor && "border-red-500")}
             defaultValue={
               mode === "edit" && initialData ? initialData.assessor : ""
             }
@@ -230,7 +236,7 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
             {...register("accountNumber")}
             placeholder="Enter account number"
             maxLength={50}
-            className={errors.accountNumber ? "border-red-500" : ""}
+            className={cn("w-full", errors.accountNumber && "border-red-500")}
             defaultValue={
               mode === "edit" && initialData ? initialData.accountNumber : ""
             }
@@ -249,7 +255,7 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
             id="appealedDate"
             type="date"
             {...register("appealedDate")}
-            className={errors.appealedDate ? "border-red-500" : ""}
+            className={cn("w-full", errors.appealedDate && "border-red-500")}
             defaultValue={
               mode === "edit" && initialData
                 ? formatDateForInput(initialData.appealedDate)
@@ -275,7 +281,7 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger
-                  className={errors.status ? "border-red-500" : ""}
+                  className={cn("w-full", errors.status && "border-red-500")}
                 >
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -302,7 +308,7 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
             {...register("appealedBy")}
             placeholder="Enter name"
             maxLength={50}
-            className={errors.appealedBy ? "border-red-500" : ""}
+            className={cn("w-full", errors.appealedBy && "border-red-500")}
             defaultValue={
               mode === "edit" && initialData ? initialData.appealedBy : ""
             }
@@ -317,7 +323,8 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
       <div className="flex justify-end gap-4 pt-6 border-t">
         <Button
           type="button"
-          variant="outline"
+          variant="destructive"
+          className="bg-custom-red"
           onClick={handleCancel}
           disabled={isSubmitting}
         >

@@ -16,7 +16,7 @@ export function SelectionToast({
   onClear,
 }: SelectionToastProps) {
   return (
-    <div className="bg-blue-50/90 dark:bg-blue-900/90 border border-blue-200 dark:border-blue-800 rounded-lg shadow-lg px-6 py-4 flex flex-wrap lg:flex-nowrap items-center gap-6 sm:min-w-[600px]">
+    <div className="bg-blue-50/90 dark:bg-[#2c4e6c] border border-blue-200 dark:border-blue-800 rounded-lg shadow-lg px-6 py-4 flex flex-wrap lg:flex-nowrap items-center gap-6 sm:min-w-[600px]">
       {/* Left side - Selection count */}
       <div className="text-blue-900 dark:text-blue-100 font-medium text-sm w-32">
         {selectedCount} Appeal Letter selected
@@ -27,26 +27,27 @@ export function SelectionToast({
         <Button
           variant="outline"
           size="sm"
-          className="border-green-500 text-green-600 hover:bg-green-50 bg-white dark:bg-gray-800 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-900/20 h-8 px-3"
+          className="border-custom-teal text-custom-teal hover:bg-custom-teal/20 bg-white dark:bg-gray-800 dark:border-custom-teal dark:text-custom-teal dark:hover:bg-custom-teal/20 h-8 px-3"
         >
-          <Download size={14} className="mr-1.5" />
+          <Download size={14} />
           Export Grid Details
         </Button>
 
         <Button
           variant="outline"
           size="sm"
-          className="border-green-500 text-green-600 hover:bg-green-50 bg-white dark:bg-gray-800 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-900/20 h-8 px-3"
+          className="border-custom-teal text-custom-teal hover:bg-custom-teal/20 bg-white dark:bg-gray-800 dark:border-custom-teal dark:text-custom-teal dark:hover:bg-custom-teal/20 h-8 px-3"
         >
-          <FileText size={14} className="mr-1.5" />
+          <FileText size={14} />
           Download Letter
         </Button>
 
         <Button
           size="sm"
-          className="bg-green-600 hover:bg-green-700 text-white h-8 px-3"
+          className="bg-custom-teal hover:bg-custom-teal/80 text-white h-8 px-3 cursor-pointer"
+          onClick={() => toast.dismiss(id)}
         >
-          <Settings size={14} className="mr-1.5" />
+          <Settings size={14} />
           Change Status
         </Button>
       </div>
