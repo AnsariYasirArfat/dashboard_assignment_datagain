@@ -2,12 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import {
-  ChevronsUpDown,
-  ChevronsDownUp,
-  ListFilter,
-  MoreHorizontal,
-} from "lucide-react";
+import { ChevronsUpDown, ChevronsDownUp, ListFilter } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -17,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pagination } from "./Pagination";
-import { AppealData, appealDataColumns } from "@/data/appeal-letter";
+import { AppealData, appealDataColumns, formatDateForDisplay, statusOptions } from "@/data/appeal-letter";
 import { cn } from "@/lib/utils";
 import { SelectionToast } from "./SelectionToast";
 import { toast } from "sonner";
@@ -29,6 +24,7 @@ import {
   setSortColumn,
   setSortDirection,
 } from "@/store/reducers/appealLetterSlice";
+import ActionsMenu from "./ActionsMenu";
 
 export function AppealLetterTable() {
   const dispatch = useAppDispatch();
@@ -57,9 +53,9 @@ export function AppealLetterTable() {
     const bValue = b[sortColumn as keyof AppealData];
 
     if (sortDirection === "asc") {
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      return String(aValue).localeCompare(String(bValue));
     } else {
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      return String(bValue).localeCompare(String(aValue));
     }
   });
 
@@ -134,6 +130,12 @@ export function AppealLetterTable() {
     );
   };
 
+  // Helper function to get status label
+  const getStatusLabel = (status: string) => {
+    const statusOption = statusOptions.find(option => option.value === status);
+    return statusOption ? statusOption.label : status;
+  };
+
   // Check if all rows on current page are selected
   const isAllSelected =
     paginatedData.length > 0 &&
@@ -141,8 +143,8 @@ export function AppealLetterTable() {
 
   return (
     <div className="rounded-t-md overflow-hidden min-h-0 flex flex-col h-full">
-      <div className="overflow-auto  flex-1 h-full y-hidden">
-        <Table className="min-w-[1200px] ">
+      <div className="overflow-auto flex-1 h-full y-hidden">
+        <Table className="min-w-[1200px]">
           <TableHeader>
             <TableRow className="bg-[#ecf3f9] dark:bg-gray-700 [&_button]:text-xs">
               <TableHead className="sticky left-0 bg-[#ecf3f9] dark:bg-gray-700 z-10">
@@ -205,28 +207,22 @@ export function AppealLetterTable() {
                   <span className="text-wrap">{row.accountNumber}</span>
                 </TableCell>
                 <TableCell className="text-sm sm:text-base">
-                  {row.appealedDate}
+                  {formatDateForDisplay(row.appealedDate)}
                 </TableCell>
                 <TableCell className="text-sm sm:text-base">
                   <span
                     className={`text-sm font-medium ${
-                      row.status === "Not Sent"
+                      row.status === "NOTSENT"
                         ? "text-red-600 dark:text-red-400"
                         : "text-gray-900 dark:text-gray-100"
                     }`}
                   >
-                    {row.status}
+                    {getStatusLabel(row.status)}
                   </span>
                 </TableCell>
                 <TableCell>{row.appealedBy}</TableCell>
                 <TableCell className="flex items-center justify-center">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                  >
-                    <MoreHorizontal size={16} />
-                  </Button>
+                  <ActionsMenu rowId={row.id} />
                 </TableCell>
               </TableRow>
             ))}

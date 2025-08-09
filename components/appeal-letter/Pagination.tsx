@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppSelector, useAppDispatch } from "@/store/hook";
-import { setCurrentPage, setItemsPerPage } from "@/store/reducers/appealLetterSlice";
+import { setCurrentPage } from "@/store/reducers/appealLetterSlice";
 
 export function Pagination() {
   const dispatch = useAppDispatch();
@@ -65,20 +65,20 @@ export function Pagination() {
   };
 
   return (
-    <div className="mt-4 rounded-md shadow flex items-center justify-between px-6 py-1 bg-custom-gray dark:bg-gray-900">
-      <div className="text-xs text-gray-500 dark:text-gray-400">
+    <div className="mt-4 rounded-md shadow flex items-center justify-center lg:justify-between px-2 sm:px-4 xl:px-6 py-1 bg-custom-gray dark:bg-gray-900">
+      <div className="hidden lg:block text-xs text-gray-500 dark:text-gray-400">
         {startItem}-{endItem} of {totalItems}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <Button
           variant="ghost"
           onClick={() => dispatch(setCurrentPage(Math.max(1, currentPage - 1)))}
           disabled={currentPage === 1}
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 px-2 sm:px-4"
         >
           <ArrowLeft size={14} />
-          Previous
+          <span className="hidden lg:block">Previous</span>
         </Button>
 
         <div className="flex items-center gap-1">
@@ -91,7 +91,7 @@ export function Pagination() {
                   variant="ghost"
                   onClick={() => dispatch(setCurrentPage(page as number))}
                   className={cn(
-                    "py-0.5 h-6",
+                    "py-0.5 h-6 px-2 sm:px-4",
                     currentPage === page
                       ? "bg-white dark:bg-black text-black dark:text-white"
                       : "text-gray-400"
@@ -106,16 +106,18 @@ export function Pagination() {
 
         <Button
           variant="ghost"
-          onClick={() => dispatch(setCurrentPage(Math.min(totalPages, currentPage + 1)))}
+          onClick={() =>
+            dispatch(setCurrentPage(Math.min(totalPages, currentPage + 1)))
+          }
           disabled={currentPage === totalPages}
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 px-2 sm:px-4"
         >
-          Next
+          <span className="hidden lg:block">Next</span>
           <ArrowRight size={14} />
         </Button>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="hidden lg:flex items-center gap-2">
         <span className="text-xs text-gray-500 dark:text-gray-400">
           Go on to
         </span>

@@ -1,9 +1,11 @@
-'use client'
-import { Search, MoreVertical, SlidersVertical } from "lucide-react";
+"use client";
+import { Search, SlidersVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppSelector, useAppDispatch } from "@/store/hook";
 import { setSearchTerm } from "@/store/reducers/appealLetterSlice";
+
+import { PageActionsMenu } from "./PageActionsMenu";
 
 export function SearchAndFilters() {
   const dispatch = useAppDispatch();
@@ -14,8 +16,8 @@ export function SearchAndFilters() {
   };
 
   return (
-    <div className="flex items-center gap-4 w-1/2 ml-auto">
-      <div className="flex-1 relative">
+    <div className="flex sflex-col flex-wrap items-center gap-4 xl:w-1/2 ml-auto">
+      <div className="flex-1 relative min-w-56">
         <Search
           className="absolute left-3 top-1/2 transform -translate-y-1/2"
           size={16}
@@ -29,21 +31,17 @@ export function SearchAndFilters() {
         />
       </div>
 
-      <Button
-        variant="outline"
-        size="icon"
-        className="border-custom-teal dark:border-custom-teal text-custom-teal hover:bg-custom-teal/10"
-      >
-        <SlidersVertical />
-      </Button>
+      <div  className="ml-auto">
+        <Button
+          variant="outline"
+          size="icon"
+          className="border-custom-teal dark:border-custom-teal text-custom-teal hover:bg-custom-teal/10"
+        >
+          <SlidersVertical />
+        </Button>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="text-gray-600 dark:text-gray-400 rounded-full"
-      >
-        <MoreVertical />
-      </Button>
+        <PageActionsMenu />
+      </div>
     </div>
   );
 }

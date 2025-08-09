@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface AppealLetterState {
   data: AppealData[];
-  selectedRows: string[]; 
+  selectedRows: string[];
   sortColumn: string | null;
   sortDirection: "asc" | "desc";
   searchTerm: string;
@@ -36,7 +36,7 @@ export const appealLetterSlice = createSlice({
         ...action.payload,
         id: newId,
       };
-      state.data.push(newAppealLetter);
+      state.data.unshift(newAppealLetter);
     },
 
     updateAppealLetter: (state, action: PayloadAction<AppealData>) => {
@@ -50,7 +50,6 @@ export const appealLetterSlice = createSlice({
 
     deleteAppealLetter: (state, action: PayloadAction<string>) => {
       state.data = state.data.filter((item) => item.id !== action.payload);
-      // Remove from selected rows if it was selected
       state.selectedRows = state.selectedRows.filter(id => id !== action.payload);
     },
 
@@ -58,7 +57,6 @@ export const appealLetterSlice = createSlice({
       state.data = state.data.filter(
         (item) => !action.payload.includes(item.id)
       );
-      // Remove from selected rows
       state.selectedRows = state.selectedRows.filter(id => !action.payload.includes(id));
     },
 
@@ -71,10 +69,8 @@ export const appealLetterSlice = createSlice({
       const id = action.payload;
       const index = state.selectedRows.indexOf(id);
       if (index !== -1) {
-        // Remove from array
         state.selectedRows.splice(index, 1);
       } else {
-        // Add to array
         state.selectedRows.push(id);
       }
     },
@@ -103,7 +99,7 @@ export const appealLetterSlice = createSlice({
     // Search
     setSearchTerm: (state, action: PayloadAction<string>) => {
       state.searchTerm = action.payload;
-      state.currentPage = 1; // Reset to first page when searching
+      state.currentPage = 1;
     },
 
     // Pagination
@@ -128,7 +124,7 @@ export const appealLetterSlice = createSlice({
     // Bulk Operations
     updateStatus: (
       state,
-      action: PayloadAction<{ ids: string[]; status: "Not Sent" | "Sent" }>
+      action: PayloadAction<{ ids: string[]; status: "NOTSENT" | "SENT" }>
     ) => {
       const { ids, status } = action.payload;
       state.data.forEach((item) => {
