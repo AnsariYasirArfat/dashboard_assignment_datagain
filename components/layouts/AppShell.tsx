@@ -12,11 +12,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="hidden lg:block flex-shrink-0">
           <Sidebar />
         </div>
-        
+
         {/* Main Content */}
-        <div className="flex-1 min-h-0 overflow-hidden">
-          {children}
-        </div>
+        <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
       </main>
     </div>
   );
