@@ -102,10 +102,10 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       if (mode === "add") {
         dispatch(addAppealLetter(formData));
-        router.push("/");
+        router.push("/appeal-letter");
       } else if (mode === "edit" && initialData) {
         dispatch(updateAppealLetter({ ...formData, id: initialData.id }));
-        router.push("/");
+        router.push("/appeal-letter");
       }
     } catch (error) {
       console.error("Error saving appeal letter:", error);
@@ -113,7 +113,7 @@ export function AppealLetterForm({ mode, initialData }: AppealLetterFormProps) {
   };
 
   const handleCancel = () => {
-    router.push("/");
+    router.push("/appeal-letter");
   };
 
   // Generate tax year options
