@@ -13,7 +13,7 @@ export default function Header() {
       <div className="flex items-center gap-4">
         {/* Logo */}
         <Link
-          href={"/"}
+          href={"/appeal-letter"}
           className="flex items-center gap-1 cursor-pointer relative h-6 w-44 sm:h-8 sm:w-56"
         >
           <Image

@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import appealLetterReducer from "./reducers/appealLetterSlice";
 import layoutReducer from "./reducers/layoutSlice";
+import calendarReducer from "./reducers/calendarSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       appealLetter: appealLetterReducer,
       layout: layoutReducer,
+      calendar: calendarReducer,
     },
   });
 };
