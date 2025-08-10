@@ -4,9 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { useAppSelector, useAppDispatch } from "@/store/hook";
-import { addItem, updateItem, closeDialog, openViewDialog, CalendarItemType } from "@/store/reducers/calendarSlice";
+import {
+  addItem,
+  updateItem,
+  closeDialog,
+  openViewDialog,
+  CalendarItemType,
+} from "@/store/reducers/calendarSlice";
 
 const toISODate = (d: Date | string) =>
   (typeof d === "string" ? new Date(d) : d).toISOString().split("T")[0];
@@ -19,13 +31,33 @@ const combineISO = (date: string, time?: string) => {
 const addMinutes = (iso: string, minutes: number) =>
   new Date(new Date(iso).getTime() + minutes * 60000).toISOString();
 
+const getCurrentTime = () => {
+  const now = new Date();
+  return `${now.getHours().toString().padStart(2, "0")}:${now
+    .getMinutes()
+    .toString()
+    .padStart(2, "0")}`;
+};
+
+const getTimeFromDate = (dateStr: string) => {
+  try {
+    const date = new Date(dateStr);
+    return `${date.getHours().toString().padStart(2, "0")}:${date
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
+  } catch {
+    return getCurrentTime();
+  }
+};
+
 export default function CalendarForm() {
   const dispatch = useAppDispatch();
   const { dialog } = useAppSelector((s) => s.calendar);
-  
+
   const isEdit = dialog.mode === "edit";
   const editItem = dialog.selectedItem;
-  
+
   const [itemType, setItemType] = useState<CalendarItemType>("event");
   const [title, setTitle] = useState("");
 
@@ -42,43 +74,57 @@ export default function CalendarForm() {
   const [remDuration, setRemDuration] = useState("15");
 
   useEffect(() => {
+    const currentTime = getCurrentTime();
+
     if (isEdit && editItem) {
-      // Populate form with existing data
       setItemType(editItem.type);
       setTitle(editItem.title);
       setAllDay(editItem.allDay || false);
-      
+
       const startDate = new Date(editItem.start);
       setEvStartDate(toISODate(startDate));
       setRemDate(toISODate(startDate));
-      
+
       if (!editItem.allDay) {
-        setEvStartTime(`${startDate.getHours().toString().padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`);
-        setRemTime(`${startDate.getHours().toString().padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`);
+        setEvStartTime(getTimeFromDate(editItem.start));
+        setRemTime(getTimeFromDate(editItem.start));
       }
-      
+
       if (editItem.end) {
         const endDate = new Date(editItem.end);
         setEvEndDate(toISODate(endDate));
         if (!editItem.allDay) {
-          setEvEndTime(`${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`);
+          setEvEndTime(getTimeFromDate(editItem.end));
         }
       }
     } else if (dialog.clickedDateInfo) {
-      // New item from date click
       const d = toISODate(dialog.clickedDateInfo.dateStr);
       setEvStartDate(d);
       setEvEndDate(d);
       setRemDate(d);
       setAllDay(dialog.clickedDateInfo.allDay);
-      
-      if (!dialog.clickedDateInfo.allDay && dialog.clickedDateInfo.timeStr) {
-        setEvStartTime(dialog.clickedDateInfo.timeStr);
-        setRemTime(dialog.clickedDateInfo.timeStr);
+
+      if (!dialog.clickedDateInfo.allDay) {
+        if (dialog.clickedDateInfo.timeStr) {
+          setEvStartTime(dialog.clickedDateInfo.timeStr);
+          setRemTime(dialog.clickedDateInfo.timeStr);
+        } else {
+          setEvStartTime(currentTime);
+          setRemTime(currentTime);
+        }
       } else {
-        setEvStartTime("");
-        setRemTime("");
+        setEvStartTime(currentTime);
+        setRemTime(currentTime);
       }
+    } else {
+      const today = new Date();
+      const todayStr = toISODate(today);
+      
+      setEvStartDate(todayStr);
+      setEvEndDate(todayStr);
+      setRemDate(todayStr);
+      setEvStartTime(currentTime);
+      setRemTime(currentTime);
     }
   }, [dialog.clickedDateInfo, isEdit, editItem]);
 
@@ -170,28 +216,34 @@ export default function CalendarForm() {
 
   return (
     <>
-      {/* Title Input - Always visible */}
       <div className="space-y-2">
         <Label>Title</Label>
-        <Input 
-          value={title} 
-          onChange={(e) => setTitle(e.target.value)} 
-          maxLength={80} 
-          placeholder="Event/Reminder title" 
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={80}
+          placeholder="Event/Reminder title"
         />
       </div>
 
-      {/* Type Selection Buttons - Only for new items */}
       {!isEdit && (
         <div className="grid grid-cols-2 gap-3">
-          <Button 
-            className={`${itemType === "event" ? "bg-custom-teal hover:bg-custom-teal/90" : "bg-gray-200 hover:bg-gray-300 text-gray-700"}`}
+          <Button
+            className={`${
+              itemType === "event"
+                ? "bg-custom-teal hover:bg-custom-teal/90"
+                : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+            }`}
             onClick={() => setItemType("event")}
           >
             Event
           </Button>
-          <Button 
-            className={`${itemType === "reminder" ? "bg-custom-teal hover:bg-custom-teal/90" : "bg-gray-200 hover:bg-gray-300 text-gray-700"}`}
+          <Button
+            className={`${
+              itemType === "reminder"
+                ? "bg-custom-teal hover:bg-custom-teal/90"
+                : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+            }`}
             onClick={() => setItemType("reminder")}
           >
             Reminder
@@ -203,10 +255,10 @@ export default function CalendarForm() {
       {itemType === "event" && (
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="allDay" 
-              checked={allDay} 
-              onCheckedChange={(checked) => setAllDay(checked as boolean)} 
+            <Checkbox
+              id="allDay"
+              checked={allDay}
+              onCheckedChange={(checked) => setAllDay(checked as boolean)}
             />
             <Label htmlFor="allDay">All Day</Label>
           </div>
@@ -214,31 +266,31 @@ export default function CalendarForm() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Start date</Label>
-              <Input 
-                type="date" 
-                value={evStartDate} 
-                onChange={(e) => setEvStartDate(e.target.value)} 
+              <Input
+                type="date"
+                value={evStartDate}
+                onChange={(e) => setEvStartDate(e.target.value)}
               />
               {!allDay && (
-                <Input 
-                  type="time" 
-                  value={evStartTime} 
-                  onChange={(e) => setEvStartTime(e.target.value)} 
+                <Input
+                  type="time"
+                  value={evStartTime}
+                  onChange={(e) => setEvStartTime(e.target.value)}
                 />
               )}
             </div>
             <div className="space-y-2">
               <Label>End date (optional)</Label>
-              <Input 
-                type="date" 
-                value={evEndDate} 
-                onChange={(e) => setEvEndDate(e.target.value)} 
+              <Input
+                type="date"
+                value={evEndDate}
+                onChange={(e) => setEvEndDate(e.target.value)}
               />
               {!allDay && (
-                <Input 
-                  type="time" 
-                  value={evEndTime} 
-                  onChange={(e) => setEvEndTime(e.target.value)} 
+                <Input
+                  type="time"
+                  value={evEndTime}
+                  onChange={(e) => setEvEndTime(e.target.value)}
                 />
               )}
             </div>
@@ -249,32 +301,35 @@ export default function CalendarForm() {
       {/* Reminder Form */}
       {itemType === "reminder" && (
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="space-y-2 col-span-2">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
               <Label>Date</Label>
-              <Input 
-                type="date" 
-                value={remDate} 
-                onChange={(e) => setRemDate(e.target.value)} 
+              <Input
+                type="date"
+                value={remDate}
+                onChange={(e) => setRemDate(e.target.value)}
               />
             </div>
             <div className="space-y-2">
               <Label>Time</Label>
-              <Input 
-                type="time" 
-                value={remTime} 
-                onChange={(e) => setRemTime(e.target.value)} 
+              <Input
+                type="time"
+                value={remTime}
+                onChange={(e) => setRemTime(e.target.value)}
               />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label>Duration</Label>
-            <Select value={remDuration} onValueChange={(v) => setRemDuration(v)}>
-              <SelectTrigger><SelectValue placeholder="Duration (min)" /></SelectTrigger>
+            <Select
+              value={remDuration}
+              onValueChange={(v) => setRemDuration(v)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Duration (min)" />
+              </SelectTrigger>
               <SelectContent>
-                <SelectItem value="5">5 min</SelectItem>
-                <SelectItem value="10">10 min</SelectItem>
                 <SelectItem value="15">15 min</SelectItem>
                 <SelectItem value="30">30 min</SelectItem>
                 <SelectItem value="60">60 min</SelectItem>
@@ -286,8 +341,13 @@ export default function CalendarForm() {
 
       {/* Footer */}
       <div className="flex justify-end gap-2 pt-4">
-        <Button variant="ghost" onClick={handleCancel}>Cancel</Button>
-        <Button className="bg-custom-teal hover:bg-custom-teal/90" onClick={handleSave}>
+        <Button variant="ghost" onClick={handleCancel}>
+          Cancel
+        </Button>
+        <Button
+          className="bg-custom-teal hover:bg-custom-teal/90"
+          onClick={handleSave}
+        >
           {isEdit ? "Update" : "Save"}
         </Button>
       </div>
