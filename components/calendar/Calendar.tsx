@@ -2,11 +2,13 @@
 import dynamic from "next/dynamic";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-import { useMemo, useState } from "react";
-import { useAppSelector } from "@/store/hook";
-import AddItemDialog from "./AddItemDialog";
+import { useMemo } from "react";
+import { useAppSelector, useAppDispatch } from "@/store/hook";
+import { openAddDialog, openViewDialog } from "@/store/reducers/calendarSlice";
+import { EventClickArg } from "@fullcalendar/core";
+import CalendarDialog from "./CalendarDialog";
 
 const FullCalendar = dynamic(() => import("@fullcalendar/react"), {
   ssr: false,
@@ -27,8 +29,7 @@ const typeColors = {
 
 export default function Calendar() {
   const items = useAppSelector((s) => s.calendar.items);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [clickedDateISO, setClickedDateISO] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
   const events = useMemo(
     () =>
@@ -43,6 +44,33 @@ export default function Calendar() {
       })),
     [items]
   );
+
+  const handleDateClick = (info: DateClickArg) => {
+    console.log("Date click: ", info);
+    const timeStr = !info.allDay
+      ? `${info.date.getHours().toString().padStart(2, "0")}:${info.date
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`
+      : undefined;
+
+    dispatch(
+      openAddDialog({
+        dateStr: info.dateStr,
+        allDay: info.allDay,
+        date: info.date,
+        timeStr,
+      })
+    );
+  };
+
+  const handleEventClick = (info: EventClickArg) => {
+    console.log("event click : ", info);
+    const item = items.find(x => x.id === info.event.id);
+    if (item) {
+      dispatch(openViewDialog(item));
+    }
+  };
 
   return (
     <>
@@ -67,18 +95,12 @@ export default function Calendar() {
           selectable
           dayMaxEventRows
           events={events}
-          dateClick={(info) => {
-            setClickedDateISO(info.dateStr);
-            setDialogOpen(true);
-          }}
+          dateClick={handleDateClick}
+          eventClick={handleEventClick}
         />
       </div>
 
-      <AddItemDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        dateISO={clickedDateISO}
-      />
+      <CalendarDialog />
     </>
   );
 }

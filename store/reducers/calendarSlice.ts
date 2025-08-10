@@ -11,16 +11,68 @@ export interface CalendarItem {
   type: CalendarItemType;
 }
 
-interface CalendarState {
-  items: CalendarItem[];
+export interface DateClickInfo {
+  dateStr: string;
+  allDay: boolean;
+  date: Date;
+  timeStr?: string;
 }
 
-const initialState: CalendarState = { items: [] };
+export type DialogMode = "add" | "view" | "edit";
+
+export interface DialogState {
+  mode: DialogMode;
+  open: boolean;
+  clickedDateInfo: DateClickInfo | null;
+  selectedItem: CalendarItem | null;
+}
+
+interface CalendarState {
+  items: CalendarItem[];
+  dialog: DialogState;
+}
+
+const initialState: CalendarState = { 
+  items: [],
+  dialog: {
+    mode: "add",
+    open: false,
+    clickedDateInfo: null,
+    selectedItem: null
+  }
+};
 
 const calendarSlice = createSlice({
   name: "calendar",
   initialState,
   reducers: {
+    openAddDialog: (state, { payload }: PayloadAction<DateClickInfo>) => {
+      state.dialog = {
+        mode: "add",
+        open: true,
+        clickedDateInfo: payload,
+        selectedItem: null
+      };
+    },
+    openViewDialog: (state, { payload }: PayloadAction<CalendarItem>) => {
+      state.dialog = {
+        mode: "view",
+        open: true,
+        clickedDateInfo: null,
+        selectedItem: payload
+      };
+    },
+    openEditDialog: (state, { payload }: PayloadAction<CalendarItem>) => {
+      state.dialog = {
+        mode: "edit",
+        open: true,
+        clickedDateInfo: null,
+        selectedItem: payload
+      };
+    },
+    closeDialog: (state) => {
+      state.dialog.open = false;
+    },
     addItem: {
       reducer: (state, { payload }: PayloadAction<CalendarItem>) => {
         state.items.push(payload);
@@ -39,5 +91,13 @@ const calendarSlice = createSlice({
   },
 });
 
-export const { addItem, updateItem, deleteItem } = calendarSlice.actions;
+export const { 
+  openAddDialog, 
+  openViewDialog, 
+  openEditDialog,
+  closeDialog,
+  addItem, 
+  updateItem, 
+  deleteItem 
+} = calendarSlice.actions;
 export default calendarSlice.reducer;
